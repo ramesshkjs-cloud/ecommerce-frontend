@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import './App.css';
 
@@ -14,9 +14,7 @@ function App() {
   const [product, setProduct] = useState({ name: '', description: '', price: '', quantity: '' });
   const [editId, setEditId] = useState(null);
 
-  useEffect(() => {
-    if (token) fetchProducts();
-  }, [token]);
+
 
   const register = async () => {
     try {
@@ -61,7 +59,7 @@ function App() {
     setProducts([]);
   };
 
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     try {
       const response = await axios.get(`${API_URL}/products`, {
         headers: { Authorization: `Bearer ${token}` }
@@ -70,7 +68,11 @@ function App() {
     } catch (error) {
       alert('Failed to fetch products');
     }
-  };
+  }, [token]);
+
+  useEffect(() => {
+    if (token) fetchProducts();
+  }, [token, fetchProducts]);
 
   const createProduct = async () => {
     try {
